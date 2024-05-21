@@ -1,17 +1,21 @@
 <template>
-  <div class="container"></div>
+  <div class="container">
+    <form action="">
+      <input class="border-2" type="text" />
+    </form>
+  </div>
   <name-search-response></name-search-response>
 </template>
 
 <script>
-import NameSearchResponse from '@/components/NameSearchResponse.vue'
+import NameSearchResponse from "@/components/NameSearchResponse.vue";
 
 export default {
-  name: 'NameSearcher',
+  name: "NameSearcher",
   components: {
     NameSearchResponse,
   },
-}
+};
 </script>
 
 <style scoped lang="scss">
