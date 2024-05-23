@@ -24,17 +24,14 @@
       ></name-search-response>
     </div>
 
-    <button
+    <!-- <button
       @click="toggleWinnersArrayVisibility"
       class="border-2 px-2 py-1 mt-10"
     >
       {{ showWinners ? "Hide" : "Show" }} Winners
-    </button>
+    </button> -->
 
-    <div
-      v-if="showWinners"
-      class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg mt-10 mx-5"
-    >
+    <div class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg mt-10 mx-5">
       <h1 class="text-[20px] mb-5">Today's winners:</h1>
       <p v-for="(name, index) in winnersArray" :key="index">{{ name }}</p>
     </div>
@@ -97,9 +94,9 @@ export default {
         };
 
         isDuplicate.value = winnersArray.value.includes(formattedInputName);
-      } catch (error) {
+      } catch (err) {
         error.value = "An error occurred while fetching data";
-        console.log(error.value);
+        console.error(error);
       }
     };
 
