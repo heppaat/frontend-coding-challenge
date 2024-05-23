@@ -24,7 +24,17 @@
       ></name-search-response>
     </div>
 
-    <div class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg mt-10 mx-5">
+    <button
+      @click="toggleWinnersArrayVisibility"
+      class="border-2 px-2 py-1 mt-10"
+    >
+      {{ showWinners ? "Hide" : "Show" }} Winners
+    </button>
+
+    <div
+      v-if="showWinners"
+      class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg mt-10 mx-5"
+    >
       <h1 class="text-[20px] mb-5">Today's winners:</h1>
       <p v-for="(name, index) in winnersArray" :key="index">{{ name }}</p>
     </div>
@@ -48,6 +58,7 @@ export default {
     const winnersArray = ref([]);
     const isDuplicate = ref(false);
     const accepted = ref(false);
+    const showWinners = ref(false);
 
     watch(accepted, (newVal) => {
       if (newVal) {
@@ -104,6 +115,10 @@ export default {
       result.value = null;
     };
 
+    const toggleWinnersArrayVisibility = () => {
+      showWinners.value = !showWinners.value;
+    };
+
     return {
       inputName,
       result,
@@ -114,6 +129,8 @@ export default {
       handleSubmit,
       handleReject,
       handleAccept,
+      showWinners,
+      toggleWinnersArrayVisibility,
     };
   },
 };
