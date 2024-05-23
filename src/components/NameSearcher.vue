@@ -15,7 +15,7 @@
 
     <p v-if="error" class="flex mt-10">Error: {{ error }}</p>
 
-    <div v-if="result">
+    <div v-if="result" class="flex justify-center">
       <name-search-response
         :result="result"
         :reject="handleReject"
@@ -24,9 +24,7 @@
       ></name-search-response>
     </div>
 
-    <div
-      class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg max-w-[350px] mt-10 mx-5"
-    >
+    <div class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg mt-10 mx-5">
       <h1 class="text-[20px] mb-5">Today's winners:</h1>
       <p v-for="(name, index) in winnersArray" :key="index">{{ name }}</p>
     </div>
