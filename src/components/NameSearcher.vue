@@ -8,9 +8,17 @@
         class="border-2"
         type="text"
         v-model="inputName"
+        @input="validateInput"
         placeholder="Enter name..."
       />
-      <button class="border-2 px-2 py-1" type="submit">Check</button>
+      <button
+        class="border-2 px-2 py-1"
+        type="submit"
+        :disabled="inputError !== ''"
+      >
+        Check
+      </button>
+      <p v-if="inputError">{{ inputError }}</p>
     </form>
 
     <p v-if="error" class="flex mt-10">Error: {{ error }}</p>
@@ -60,6 +68,7 @@ export default {
     const isDuplicate = ref(false);
     const accepted = ref(false);
     const showWinners = ref(false);
+    const inputError = ref("");
 
     watch(accepted, (newVal) => {
       if (newVal) {
@@ -79,6 +88,17 @@ export default {
       return array.some(
         (person) => person.name.toLowerCase() === lowerCaseInputName
       );
+    };
+
+    const validateInput = () => {
+      const value = inputName.value.trim();
+      if (!value.match(/^[a-zA-Z\s]*$/)) {
+        inputError.value = "Only letters and spaces are allowed";
+      } else if (value.length <= 2) {
+        inputError.value = "Name must be at least 2 characters long";
+      } else {
+        inputError.value = "";
+      }
     };
 
     const checkName = async () => {
@@ -139,6 +159,8 @@ export default {
       handleAccept,
       showWinners,
       toggleWinnersArrayVisibility,
+      inputError,
+      validateInput,
     };
   },
 };
