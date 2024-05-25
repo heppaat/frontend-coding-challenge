@@ -24,14 +24,17 @@
       ></name-search-response>
     </div>
 
-    <!-- <button
+    <button
       @click="toggleWinnersArrayVisibility"
       class="border-2 px-2 py-1 mt-10"
     >
       {{ showWinners ? "Hide" : "Show" }} Winners
-    </button> -->
+    </button>
 
-    <div class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg mt-10 mx-5">
+    <div
+      v-if="showWinners"
+      class="flex flex-col bg-[#f4f4f5] p-4 rounded-lg mt-10 mx-5"
+    >
       <h1 class="text-[20px] mb-5">Today's winners:</h1>
       <p v-for="(name, index) in winnersArray" :key="index">{{ name }}</p>
     </div>
@@ -42,6 +45,7 @@
 import NameSearchResponse from "@/components/NameSearchResponse.vue";
 import { getAll } from "../api/peopleApi";
 import { ref, watch } from "vue";
+import { PeopleSchema } from "../modell";
 
 export default {
   name: "NameSearcher",
@@ -81,8 +85,15 @@ export default {
       error.value = "";
       try {
         const response = await getAll();
+        const parsedResult = PeopleSchema.safeParse(response);
+        if (!parsedResult.success) {
+          error.value = "Failed to parse data";
+          return;
+        }
 
-        const luckyOrNot = isLucky(inputName.value, response);
+        const peopleArray = parsedResult.data;
+
+        const luckyOrNot = isLucky(inputName.value, peopleArray);
 
         const formattedInputName =
           inputName.value.trim().charAt(0).toUpperCase() +
