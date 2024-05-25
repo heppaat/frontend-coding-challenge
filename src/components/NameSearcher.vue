@@ -12,7 +12,7 @@
         placeholder="Enter name..."
       />
       <button
-        class="border-2 px-2 py-1"
+        class="border-2 px-2 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
         type="submit"
         :disabled="inputError !== ''"
       >
