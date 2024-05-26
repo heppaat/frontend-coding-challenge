@@ -46,6 +46,15 @@
       <h1 class="text-[20px] mb-5">Today's winners:</h1>
       <p v-for="(name, index) in winnersArray" :key="index">{{ name }}</p>
     </div>
+
+    <router-link
+      :to="{
+        path: '/winners',
+        query: { winners: JSON.stringify(winnersArray) },
+      }"
+      class="flex justify-center text-blue-500 mt-4"
+      >Go to winner's page</router-link
+    >
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export const PeopleSchema = z
-  .object({
-    name: z.string(),
-  })
-  .array();
+const PersonSchema = z.object({
+  name: z.string(),
+});
+
+export const PeopleSchema = PersonSchema.array();
