@@ -45,7 +45,7 @@ export default {
 
     const clearWinners = () => {
       localWinnersArray.value = [];
-      localStorage.removeItem("winnersArray");
+      localStorage.setItem("winnersArray", JSON.stringify([]));
     };
 
     return {
