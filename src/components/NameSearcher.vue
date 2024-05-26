@@ -49,7 +49,7 @@
 
     <router-link
       :to="{
-        path: '/winners',
+        name: 'Winners',
         query: { winners: JSON.stringify(winnersArray) },
       }"
       class="flex justify-center text-blue-500 mt-4"
@@ -61,7 +61,7 @@
 <script>
 import NameSearchResponse from "@/components/NameSearchResponse.vue";
 import { getAll } from "../api/peopleApi";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { PeopleSchema } from "../modell";
 
 export default {
@@ -78,6 +78,21 @@ export default {
     const accepted = ref(false);
     const showWinners = ref(false);
     const inputError = ref("");
+
+    onMounted(() => {
+      const savedWinners = localStorage.getItem("winnersArray");
+      if (savedWinners) {
+        winnersArray.value = JSON.parse(savedWinners);
+      }
+    });
+
+    watch(
+      winnersArray,
+      (newVal) => {
+        localStorage.setItem("winnersArray", JSON.stringify(newVal));
+      },
+      { deep: true }
+    );
 
     watch(accepted, (newVal) => {
       if (newVal) {
