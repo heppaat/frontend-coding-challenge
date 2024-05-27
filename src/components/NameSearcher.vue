@@ -12,16 +12,19 @@
         placeholder="Enter name..."
       />
       <button
-        class="border-2 px-2 py-1 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="border-2 px-2 py-1 mb-5 disabled:opacity-50 disabled:cursor-not-allowed"
         type="submit"
-        :disabled="inputError !== ''"
+        :disabled="inputError !== '' || winnersArray.length >= 10"
       >
         Check
       </button>
-      <p v-if="inputError">{{ inputError }}</p>
+      <p v-if="inputError" class="text-red-500">{{ inputError }}</p>
     </form>
 
-    <p v-if="error" class="flex mt-10">Error: {{ error }}</p>
+    <p v-if="error" class="flex mt-10 text-red-500">Error: {{ error }}</p>
+    <p v-if="previousDayError" class="flex mt-10 text-red-500">
+      Error: {{ previousDayError }}
+    </p>
 
     <div v-if="result" class="flex justify-center">
       <name-search-response
@@ -45,6 +48,16 @@
     >
       <h1 class="text-[20px] mb-5">Today's winners:</h1>
       <p v-for="(name, index) in winnersArray" :key="index">{{ name }}</p>
+    </div>
+
+    <div class="flex justify-center">
+      <button @click="nextDay" class="border-2 px-2 py-1 mt-4">Next day</button>
+    </div>
+
+    <div class="flex justify-center">
+      <button @click="clearPreviousDaysWinners" class="border-2 px-2 py-1 mt-4">
+        Clear Previous Days
+      </button>
     </div>
 
     <router-link
@@ -73,16 +86,29 @@ export default {
     const inputName = ref("");
     const result = ref(null);
     const error = ref("");
+    const previousDayError = ref("");
     const winnersArray = ref([]);
     const isDuplicate = ref(false);
     const accepted = ref(false);
     const showWinners = ref(false);
     const inputError = ref("");
+    const currentDay = ref(1);
+    const previousDaysWinners = ref([]);
 
     onMounted(() => {
       const savedWinners = localStorage.getItem("winnersArray");
+      const savedCurrentDay = localStorage.getItem("currentDay");
+      const savedPreviousDaysWinners = localStorage.getItem(
+        "previousDaysWinners"
+      );
       if (savedWinners) {
         winnersArray.value = JSON.parse(savedWinners);
+      }
+      if (savedCurrentDay) {
+        currentDay.value = JSON.parse(savedCurrentDay);
+      }
+      if (savedPreviousDaysWinners) {
+        previousDaysWinners.value = JSON.parse(savedPreviousDaysWinners);
       }
     });
 
@@ -90,6 +116,18 @@ export default {
       winnersArray,
       (newVal) => {
         localStorage.setItem("winnersArray", JSON.stringify(newVal));
+      },
+      { deep: true }
+    );
+
+    watch(currentDay, (newVal) => {
+      localStorage.setItem("currentDay", JSON.stringify(newVal));
+    });
+
+    watch(
+      previousDaysWinners,
+      (newVal) => {
+        localStorage.setItem("previousDaysWinners", JSON.stringify(newVal));
       },
       { deep: true }
     );
@@ -103,8 +141,6 @@ export default {
 
     const handleSubmit = async () => {
       await checkName();
-      console.log(result.value);
-      console.log(isDuplicate.value);
     };
 
     const isLucky = (input, array) => {
@@ -127,6 +163,7 @@ export default {
 
     const checkName = async () => {
       error.value = "";
+      previousDayError.value = "";
       try {
         const response = await getAll();
         const parsedResult = PeopleSchema.safeParse(response);
@@ -148,7 +185,12 @@ export default {
           isLucky: luckyOrNot,
         };
 
-        isDuplicate.value = winnersArray.value.includes(formattedInputName);
+        if (previousDaysWinners.value.includes(formattedInputName)) {
+          previousDayError.value = `${formattedInputName} was already a winner on a previous day`;
+          result.value = null;
+        } else {
+          isDuplicate.value = winnersArray.value.includes(formattedInputName);
+        }
       } catch (err) {
         error.value = "An error occurred while fetching data";
         console.error(error);
@@ -161,7 +203,11 @@ export default {
 
     const handleAccept = () => {
       accepted.value = true;
-      if (result.value && !isDuplicate.value) {
+      if (
+        result.value &&
+        !isDuplicate.value &&
+        winnersArray.value.length < 10
+      ) {
         winnersArray.value.push(result.value.name);
       }
       result.value = null;
@@ -171,10 +217,22 @@ export default {
       showWinners.value = !showWinners.value;
     };
 
+    const nextDay = () => {
+      previousDaysWinners.value.push(...winnersArray.value);
+      winnersArray.value = [];
+      currentDay.value += 1;
+    };
+
+    const clearPreviousDaysWinners = () => {
+      previousDaysWinners.value = [];
+      localStorage.setItem("previousDaysWinners", JSON.stringify([]));
+    };
+
     return {
       inputName,
       result,
       error,
+      previousDayError,
       winnersArray,
       isDuplicate,
       accepted,
@@ -185,6 +243,9 @@ export default {
       toggleWinnersArrayVisibility,
       inputError,
       validateInput,
+      nextDay,
+      currentDay,
+      clearPreviousDaysWinners,
     };
   },
 };
